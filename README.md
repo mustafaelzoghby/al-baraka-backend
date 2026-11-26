@@ -1,85 +1,75 @@
-# البركة — API
+# al-baraka-backend
 
-Express 5 + TypeScript + MongoDB (Mongoose). Serves the storefront and the dashboard.
+> Al Baraka — Arabic Fruit & Vegetables E-Commerce REST API
 
-## Run locally
+---
+
+## 📋 About
+
+Al Baraka — Arabic Fruit & Vegetables E-Commerce REST API
+
+Built by [Mustafa Mahmoud](https://mustafa-mahmoud.vercel.app) — Full-Stack Developer from Cairo, Egypt 🇪🇬
+
+### ✨ Key Features
+
+- 🚀 Modern, production-ready codebase
+- 📱 Fully responsive design
+- ⚡ Optimized performance
+- 🎨 Clean and intuitive UI/UX
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Version |
+|-----------|---------|
+| `Node.js` | latest |
+| `Express` | latest |
+| `TypeScript` | latest |
+| `MongoDB` | latest |
+| `JWT` | latest |
+| `Mongoose` | latest |
+
+---
+
+## 🚀 Setup
 
 ```bash
+git clone https://github.com/mustafaelzoghby/al-baraka-backend
+cd al-baraka-backend
 npm install
-```
-
-Copy `.env.example` to `.env`, fill in `MONGODB_URI` and `JWT_SECRET`, then create the first account:
-
-```bash
-npm run seed:superadmin
-```
-
-```bash
+cp .env.example .env
 npm run dev
 ```
 
-API runs on `http://localhost:4000`. Health check: `GET /health`.
+## ⚙️ Environment Variables
 
-## Structure
+Create a `.env` / `.env.local` file (never commit it):
 
-```
-src/
-├── app.ts              Express setup, CORS, route mounting, error handling
-├── config/             db (Mongo), sirv (images), webPush (VAPID)
-├── models/             User, Category, Product, Order, Settings, PushSubscription
-├── services/           business logic — the only layer that touches models
-├── controllers/        request/response shaping, input checks
-├── routes/             URL → controller, with auth middleware applied
-├── middlewares/        authMiddleware (protect, requireRole), uploadImages, errorHandler
-├── scripts/            seedSuperAdmin
-└── utils/              ApiError, asyncHandler, slugify
+```env
+DATABASE_URL=your_db_url
+SECRET_KEY=your_secret
+API_URL=your_api_url
 ```
 
-Controllers never talk to models directly; services never touch `req`/`res`. That split is what keeps the layers testable.
-
-## Endpoints
-
-| Method | Path | Access |
-|---|---|---|
-| POST | `/api/auth/login` | public |
-| POST | `/api/auth/logout` | public |
-| GET | `/api/auth/me` | signed in |
-| GET | `/api/categories` | public |
-| POST/PATCH/DELETE | `/api/categories/:id` | signed in |
-| GET | `/api/products` | public (`?category=&search=&page=&availableOnly=`) |
-| POST/PATCH/DELETE | `/api/products/:id` | signed in |
-| POST | `/api/orders` | public — guest checkout |
-| GET | `/api/orders/track?orderNumber=&phone=` | public |
-| GET | `/api/orders` | signed in — polled every 5s by the dashboard |
-| PATCH | `/api/orders/:id/status`, `/api/orders/:id/payment` | signed in |
-| GET | `/api/settings` | public |
-| PATCH | `/api/settings` | signed in |
-| GET/POST/PATCH/DELETE | `/api/admins` | **superadmin only** |
-| POST | `/api/upload`, `/api/upload/multiple` | signed in |
-| POST | `/api/push/subscribe`, `/unsubscribe`, `/test` | signed in |
-
-## Two rules worth keeping
-
-- **Order totals are computed server-side.** `orderService.create` reads prices from the database and ignores any price the client sends, so a tampered cart cannot change what a customer is charged.
-- **The superadmin account cannot be edited or deleted through the API.** `adminService` blocks it on every write.
-
-## Notifications
-
-A new order calls `pushService.broadcast`, which sends a Web Push message to every subscribed admin device. Dead subscriptions (404/410) are pruned automatically. Generate the keys once:
-
+## 🧪 Tests
 ```bash
-npx web-push generate-vapid-keys
+npm test
 ```
 
-Put them in `.env` as `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`. Without them the app still runs — it logs a warning and skips push.
+---
 
-## Deploy to Render
+## 👨💻 Author
 
-1. New **Web Service** → connect this repo.
-2. Build: `npm install && npm run build` · Start: `npm start`
-3. Health check path: `/health`
-4. Environment: every key from `.env.example`. `CORS_ORIGIN` must be the Vercel domain (comma-separate to add preview URLs).
-5. Environment: **`TZ=Africa/Cairo`**. Render's containers run on UTC, and the order number and the dashboard's "today" both read the local clock — left on UTC they call an order taken at 01:00 in Cairo yesterday's.
-6. Pick the region closest to your customers, and create the Atlas cluster in that same region.
-7. **Use a paid instance.** On the free plan the service sleeps after 15 minutes idle, which delays order notifications until it wakes.
-8. After the first deploy, run `npm run seed:superadmin` once from the Render shell.
+**Mustafa Mahmoud** — Full-Stack Developer
+
+[![Portfolio](https://img.shields.io/badge/Portfolio-mustafa--mahmoud.vercel.app-purple?style=flat-square)](https://mustafa-mahmoud.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-mustafaelzoghby-black?style=flat-square&logo=github)](https://github.com/mustafaelzoghby)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Mustafa%20Mahmoud-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/mustafa-mahmoud-4a38643b9)
+[![Email](https://img.shields.io/badge/Email-mustafaelzoghby7%40gmail.com-red?style=flat-square&logo=gmail)](mailto:mustafaelzoghby7@gmail.com)
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
